@@ -2,6 +2,12 @@
 title: "Signing up for Google Earth Engine"
 
 ---
+
+<br>
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/FP_Satellite_icon.svg/1024px-FP_Satellite_icon.svg.png" width = "200" border = "10">
+<br>
+
+
 ### Getting Approved as a Trusted Tester
 In order to use Google Earth Engine, you need to sign up for the platform and be approved as a trusted tester. Getting approved can take 2-3 days, so __please sign up no later than November 8th__ to make sure you are approved in time. Use the steps below to sign up.
 

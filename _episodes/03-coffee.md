@@ -7,3 +7,8 @@ break: 15
 ---
 
 coffee time
+
+
+<br>
+<img src="giphy.gif" width = "600" border = "10">
+<br>

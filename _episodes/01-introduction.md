@@ -1,55 +1,79 @@
 ---
-title: "Introduction to multidimensional arrays"
+title: "Introduction to the Google Earth Engine Javascript API"
 teaching: 15
 exercises: 0
 questions:
-- "When do we need to use multidimensional arrays?"
-- "What are current challenges is manipulating these datasets?" 
+- "What is the Google Earth Engine Javascript API?"
+- "How do I use it?" 
 objectives:
-- explore how most people currently handle these types of datasets
-- discuss how current methods are limiting the science that can be accomplished
+- Access the Javascript API, write a script and save it
+- Identify helpful elements of the Javascript Code Editor
+- Peruse available EE datasets
 keypoints:
-- gridded data that vary in space and time are common in many geospatial applcations (e.g. climatology)
-- in-memory operations are needed to process and visualize these datasets
+- GEE's enormous repository of cloud-based imagery allows you do to crazy operations on big datasets from a browser window without having to download anything.
+- The Javascript Code Editor is a great way to get started with GEE because it has more robust documentation than the Python API.
 - high resolution models and observations are producing gridded datasets that are too large for in-memory processes
-- new tools are needed that can accommodate the complexity and size of modern multidimensional datasets
+- Three useful places to find help are the User Guides, the Forum and the example scripts that come pre-loaded in the repository.
+
+Introduction to Google Earth Engine
 ---
-### Overview:
+### Background:
 
-Geoscientists often need to manipulate datasets structured as arrays. A common example is gridded data consisting of a set of climate variables (e.g. temperature and precipitation) that varies in space and time. Often we need to subset a large global dataset to look at data for a particular region, or select a specific time slice. Then we might want to apply statistical functions to these subsetted groups to generate summary information.
+> Google Earth Engine is a cloud-base geoprocessing platform. 
+> This platform, built to tackle global environmental challenges, features terabytes of geodata housed in the cloud on which users can performed advanced computation through time and space. Think GLOBAL BIG DATA at your fingertips.
 
 <br>
-<img src="http://xray.readthedocs.org/en/stable/_images/dataset-diagram.png" width = "800" border = "10">
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/FP_Satellite_icon.svg/1024px-FP_Satellite_icon.svg.png" width = "200" border = "10">
 <br>
 
-> ## Isn't this the same as raster processing? 
-> The tools in this tutorial have some similarity to raster image processing tools.
-> Both require computational engines that can manipulate large stacks of data formatted as arrays. 
-> Here we focus on tools that are optimized to handle data that have many variables spanning dimensions
-> of time and space. See the raster tutorials for tools that are optimized for image processing of remote sensing datasets.
-{: .callout}
+### Opening the API:
 
-### Common data formats:
+Use the following link to access the Google Earth Engine Javascript API:
 
-Prior to about 1990, multidimensional array data were usually stored in binary formats that would be read by Fortran 
-or C++ libraries. Users were responsbile for setting up their own file structures and custom codes to handle these files.
+		https://code.earthengine.google.com/
 
-In the early 1990s various US funding agencies began exploring portable, self-describing,
- machine independent scientific data formats. Two notable products came out of this effort:
-[netcdf](http://www.unidata.ucar.edu/software/netcdf/docs/), optimized
-for climate data analysis, and [hdf](https://www.hdfgroup.org/), used for many applications including
-distribution of remote sensing datasets. The benefits of these formats is that users could access information about the 
-file structure and variable contents from the file itself (assuming the creators of the data took the time to generate
-the appropriate metadata and attributes!).
+### API Scavenger Hunt:
 
-Note that these file formats are structured in ways that enable rapid subsetting and anaylsis using simple command line tools.
-For example, the climate community has developed their own [netcdf toolkits](http://www.unidata.ucar.edu/software/netcdf/software.html) 
-that accomplish tasks like subsetting and grouping. Similar tools exist for [hdf](https://support.hdfgroup.org/HDF5/Tutor/HDF5Intro.pdf). 
+In the API window, follow along and try to find all of these useful elements. This short tour should help you get oriented to the API. 
 
-### Common data handling methods:
+1. Where are my scripts and rasters stored?
+   * Scripts   
+   * Assets   
+ 
+2. Where can I get help when I want to write some code? 
+   * Docs (left-hand side) <br>
+   * Help > Documentation <br>
+   * Help > Users Forum   
+ 
+3. How do I find out what datasets are in Earth Engine or request new ones?
+    * Search Toolbar type in *snow* to see how it works
+	* GEE Main Website > [Datasets](http://earthengine.google.com/datasets/)
+	* Dataset Request   
 
-A common approach for handling multidimensional grids is to read the data into an array and then write a series of nested loops with conditional statements to look for a specific range of index values associated with the temporal or spatial slice needed. Also, clever use of matrix algebra is often used to summarize data across spatial and temporal dimensions.
+4.  Where do I type in my code? How do I make it run?
 
-### Challenges:
+The coding console aka Playground! Try it by typing 
+		
+		// I love donuts.
+		
+This is how you write comments. This code won't do anything, it is just there for you to write programmer-readable explanations and annotations. Now go to the top and click "Run". Your code will run -even though it is basically empty.
 
-Many multidimensional datasets are becoming very large as model resolution and sensing capabilities improve. Traditional methods for looping through array datasets to perform subsetting are no longer viable options for handling these large datasets, because we are limited by what our computers can read into memory. In addition, it is often challenging to keep track of index values when manipulating arrays that span multiple dimensions. 
+
+5.  How do I run, save and share scripts? 
+
+Change the comment to read:
+    
+		// GeoHack Week Demo Script
+
+ Now click "Save". You can tell when a script hasn't been saved because it will have a * next to the title. Now that you have saved the script, click "Get Link". If you look at your browser, you will see a new unique URL gets generated. You can copy this link and use it to share scripts with anyone else who is a Trusted Tester.
+
+
+### Cool New Features:
+
+* Profiler
+* Revision Histories
+* Shortcuts
+
+### Shortcomings and Benefits:
+
+There is an even easier-to-use access point called the Graphical User Interface. It is all just clicking buttons, but has very limited functionality. You could also call into Google using Python, but there isn't so much a developed API for Python (yet). The Python API is very powerful and allows users (perhaps) more knobs to turn, but this API is great if you want to the ease of a developed API combined with the existing robust User Guide and Help Forum, most of which is geared towards JavaScript users. 
