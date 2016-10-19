@@ -16,150 +16,117 @@ keypoints:
 --- Use the assets manager, your google drive and shpEscape to get images and vector data in and out of Google Earth Engine and to share code.
  
 
-### What is xarray?
+## Features, Images and Collections 
 
-* originally developed by employees (Stephan Hoyer, Alex Kleeman and Eugene Brevdo) at [The Climate Corporation](https://climate.com/)
-* xaray extends some of the core functionality of Pandas:
-    * operations over _named_ dimensions
-    * selection by label instead of integer location
-    * powerful groupby functionality
-    * database-like joins
+#### Features & Images
+* Feature data includes all vector data with geometry such as points, lines and polygons (like shapefiles) such as a watershed outline.
 
-### When to use xarray:
+* Images are rasters. They can have more than one band and each band has its own data type, name, resolution, and metadata. 
+* An example image might be a GlobCover raster of land use/land cover where  each pixel has a number that represents its land cover classification. 
 
-* if your data are multidimensional (e.g. climate data: x, y, z, time)
-* if your data are structured on a regular grid
-* if you can represent your data in NetCDF format
+##### Collections
+ 
+Often we are not working with a single image or feature. 
 
-### Why not just numpy?
-* joining arrays is awkward in numpy
-* labeling is limited to index position
-* arrays must be small enough to fit into memory
+* An image collection is a multidimensional stack or time series of images.  
+    * Landsat, MODIS, Sentinel satellite imagery
+    * a digital elevation model
+    * gridded population estimates
+    * global land cover maps
+* A feature collection is a collection of features. 
+	* an outline of a watershed
+	* sampling point from a field study
+	* a table of annual glacial maximums associated with a lat/long
 
-
-### Basic xray data structures:
-* Dataset: multi-dimensional equivalent of a Pandas DataFrame
-    * dict-like container of DataArray objects
-<br><br><br>
-<img src="http://xray.readthedocs.org/en/stable/_images/dataset-diagram.png" width = "800" border = "10">
-<br><br><br>
-* dimensions (x, y, time); variables (temp, precip); coords (lat, long); attributes
-
-## Using xarray
-
-### sample dataset
-
-Let's use some climate data from the European Centre for Medium-Range Weather Forecasts ([ECMWF](http://www.ecmwf.int/)). We will use their ERA-Intrim climate reanalysis project. You can download the data in netcdf format [here](http://apps.ecmwf.int/datasets/data/interim-full-daily/levtype=sfc/). As is the case for many climate products, the process involves downloading large netcdf files to a local machine
-
-Note: this example follows and expands from xarray developer Stephan Hoyer's [blog post](https://www.continuum.io/content/xray-dask-out-core-labeled-arrays-python).
-
-### begin by importing these libraries
-
-{% highlight python %}
-import matplotlib.image as mpimg
-import matplotlib.pyplot as plt
-import pandas as pd
-import numpy as np
-import xarray
-import xarray.ufuncs as xu 
-from datetime import datetime
-from dask.diagnostics import ProgressBar
-{% endhighlight %}
-
-### Open the dataset
-
-First we [open](http://xarray.pydata.org/en/stable/generated/xarray.open_dataset.html) the data and load it into a *data array*. (Note: the choice of engine depends on the format of the netcdf file).
+For each of these data types, there are vast quantities of data already available in GEE or you can import or create your own features, images and collections. 
 
 
-~~~
-ds = xarray.open_dataset('<rootDir>/ecmwf_airtemp.nc', engine = 'scipy')
-~~~
-{: .python}
+### Loading, Visualizing, Clipping and Filtering
 
-You'll notice this seemed to go very fast. That is because this step does not actually ask Python to read the data into memory. Rather, Python is just scanning the contents of the file. This is called _lazy evaluation_. 
+#### Loading Features
 
-### Inspect the Dataset contents:
+Let's load an existing Feature Collection of watershed outlines.  
 
-You can always remember what xarray has stored in each of your datasets simply by typing the variable name. 
+	var watersheds = ee.FeatureCollection("ft:1IXfrLpTHX4dtdj1LcNXjJADBB-d93rkdJ9acSEWK")
+	Map.addLayer(watersheds, null, 'watersheds')
 
-~~~
-ds
-~~~
-{: .python}
+A map will appear that should look like this: 
 
-## Dataset Properties
-
-Xarray datasets have a number of [properties](http://xarray.pydata.org/en/stable/data-structures.html#dataarray) that you can view at any time:
-
-### Dimensions
-
-Dimension are the names of each of the dimensional axes:
-
-~~~
-ds.dims
-~~~
-{: .python}
-
-### Coordinates
-Think of coordinates as the labels for all elements along each dimension. So dimensions are the names of your axes, whereas coordinates are the values of all the ticks along those axes: 
-
-~~~
-ds.coords
-~~~
-{: .python}
-
-### Attributes
-
-Attributes are metadata associated with the dataset. It's very good practice to keep track of the details of your data this way. Here we are just reading back the attribute data already stored in the climate data netcdf file. Note that all of these dataset properties are returned as Python dictionaries.
-
-~~~
-ds.attrs
-~~~
-{: .python}
-
-### Data Arrays
-
-So far we have looked at the xarray data type called a "dataset". An xarray dataset is a collection of all the elements in this graphic:
-<br>
-<img src="http://xray.readthedocs.org/en/stable/_images/dataset-diagram.png" width = "400">
-<br>
-
-We have queried the dataset details about our datset's dimensions, coordinates and attributes. Next we will look at the variable data contained within the dataset. In the graphic above, there are two variables (temperature and precipitation). In xarray, these observations get stored as a "data array", which is similar to a conventional array you would find in numpy or matlab. Let's look again at our dataset and extract some data arrays:
+![optional caption text](watersheds.png)
 
 
-Here we see that the "data variables" include "t2m", which is the air temperature at 2 m height. We can isolate the t2m "data cube" as follows: 
+You can go down to the mapping window and play with the zoom, the background and the transparency.
 
+#### Filtering Feature Collections 
 
-~~~
-ds.t2m
-~~~
-{: .python}
+We only care about Seattle, so we want to isolate our watershed name. To do this, click on the "Inspector" tab up on the right next to the Console. Then, scroll over to Seattle, click on the map and see what pops up in the "Inspector" window. What is the name of the HUC 6 that Seattle is located in?
 
-This returns a "data array". Note that the associated coordinates and attributes get carried along for the ride. Also note that we are still not reading any data into memory. 
+In order to filter the feature collection down to just that region, use the following:
+	
+	var pugetSound= watersheds.filter(ee.Filter.contains('name', 'Puget Sound'));
+	Map.addLayer(pugetSound, null, 'Puget Sound')   
 
-# Indexing
+#### Loading and Visualizing an Image
 
-Indexing is used to select specific elements from xarray files. Let's manipulate the coordinate data array to try some examples, because it is a simple one dimensional array.
+Let's load a couple different interesting images into our window.
+	
+	var elevation = ee.Image("USGS/NED")
+	Map.addLayer(elevation, {min:0, max:3000, palette:['000000',"ffffff"]},"elevation");
 
-We begin by extracting a data array from the dataset coordinates. Let's work with the 'time' coordinate: 
+#### Clipping the Image 
+Whoa. Look at the power! This is a digital elevation model for the whole United States with a resolution of 10 meters! While cool, we only want the elevation in our study area.
+	
+	Map.addLayer(elevation.clip(pugetSound), {min:0, max:3000, palette:['000000',"ffffff"]},"elevation2");
 
-~~~
-ds.coords['time']
-~~~
-{: .python}
+#### Adjusting visualization parameters
+Notice your screen is entirely blank. What do you suspect happened?
+You can fix this by adjusting the min and the max. Try this for example:
+	
+	Map.addLayer(elevation.clip(pugetSound), {min:0, max:300, palette:['000000',"ffffff"]},"elevation2");
 
-Now we will select some elements from the time array. You are probably already used to conventional ways of indexing an array using integers. Here's how that's done in xarray (it's called [positional indexing](http://xarray.pydata.org/en/stable/indexing.html)):
+*Earth Engine Documentation: https://developers.google.com/earth-engine/image_overview*
 
-~~~
-ds.coords['latitude'].isel(latitude=0)
-~~~
-{: .python}
+### Finding your Way Around (Print is your Friend)
 
-~~~
-ds.coords['latitude'].isel(latitude=slice(0,10))
-~~~
-{: .python}
+Let's explore this feature collection a little bit. First, type this into your coding console:
+	
+	print(watersheds)
+	print(elevation)
 
-### Data Arrays
-* when we index a specific variable, it returns a Data Array:
+Click around. How many features, or HUC6 watersheds are there? What kind of information or properties does each feature have?
+Now try this and notice what changes:
+	
+	print(watersheds, 'watersheds')
+
+You can do other cool stuff with print, too. 
+
+	// Print the first feature in a collection	
+	print(sheds.limit(1)); 
+
+## Image Collections 
+
+Let's use the GRIDMET image collection to find out where the wind was the strongest during Wind-A-Geddon, a large storm that happened this October in Seattle. 
+
+#### Filtering an Image Collection 
+GRIDMET is an image collection where each image in the collection represents 1 day of data and each band is a different variable (air temp, precip, etc). 
+
+Where was it the windiest in the Puget Sound Region during Wind-A-Geddon?
+	
+	var windSpeed = ee.Image(ee.ImageCollection('IDAHO_EPSCOR/GRIDMET').filterDate
+		('2016-10-08', '2016-10-12').select("vs").max())  
+
+	Map.addLayer(windSpeed, {min: 2, max: 10, 
+		palette: '0157e0,01e013,fafa5a, FF0000'},  'windSpeed')
+
+### Importing Your Own Data
+
+#### Sidenote About Fusion Tables 
+
+* Features Collections are Fusion Tables that exist outside the world of GEE, sort of like a google doc. You can find the link to the Fusion Table in the Metadata.
+* Look's go take a look at the watersheds Fusion Table. 
+	* [ https://fusiontables.google.com/DataSource?docid=1IXfrLpTHX4dtdj1LcNXjJADBB-d93rkdJ9acSEWK#rows:id=1](https://fusiontables.google.com/DataSource?docid=1IXfrLpTHX4dtdj1LcNXjJADBB-d93rkdJ9acSEWK#rows:id=1)
+
+### Importing
+* Upload your own data into Fusion Tables using shpEscape and [the instructions here. ](https://developers.google.com/earth-engine/importing)
+* Upload your own Images [using the Asset Manager](https://developers.google.com/earth-engine/asset_manager) in the Code Editor. 
 
